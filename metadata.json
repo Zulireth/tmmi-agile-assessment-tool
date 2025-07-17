@@ -1,0 +1,5 @@
+
+{
+  "name": "TMMi Agile Assessment Tool",
+  "description": "A web application to help organizations assess their TMMi Agile software testing maturity level based on the TMMi en el contexto Ágil guide. Users can answer questions related to TMMi process areas and receive feedback on their maturity for Level 2."
+}
