@@ -40,11 +40,54 @@ function App() {
     );
   };
 
+// Nueva funciónpara guardar resultados en el backend
+  // Esta función se llamará al finalizar la evaluación para enviar las respuestas y resultados al backend
+
+const handleSaveResults = async (userAnswers: UserAnswer[], results: LevelResult[]) => {
+    // La URL de tu API local que está corriendo en la otra terminal
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+
+    // Para el backend, enviaremos las respuestas del usuario y los resultados calculados.
+    const payload = {
+      answers: userAnswers,
+      feedback: results
+    };
+
+    console.log('Enviando los siguientes datos al backend:', payload);
+
+    try {
+        const response = await fetch(`${apiUrl}/responses`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'La respuesta del servidor no fue OK');
+        }
+
+        const result = await response.json();
+        console.log('¡Éxito! Respuesta del backend:', result);
+        // Podemos mostrar una notificación más sutil en lugar de un alert
+        // por ejemplo, usando una librería como react-toastify
+        alert('Resultados guardados en la base de datos.');
+
+    } catch (error) {
+        console.error('Error al guardar los resultados en el backend:', error);
+        alert('Hubo un error al guardar tus resultados. Por favor, revisa la consola.');
+    }
+};
+
   const calculateResults = () => {
     const calculator = new AssessmentCalculator(TMMI_LEVELS_DATA, answers);
     const results = calculator.calculateResults();
     setLevelResults(results);
     setShowResults(true);
+
+    // ¡AQUÍ ESTÁ LA MAGIA!
+    // Llamamos a nuestra nueva función para guardar todo en la base de datos.
+    handleSaveResults(answers, results);
   };
 
   const handleNext = () => {
@@ -116,14 +159,14 @@ function App() {
         </header>
         <main className="container mx-auto max-w-4xl">
           {levelResults.map(lr => <LevelFeedbackCard key={lr.id} levelResult={lr} />)}
-          <div className="text-center mt-12">
-            <button
-              onClick={restartSurvey}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg shadow-md transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-            >
-              Reiniciar Evaluación
-            </button>
-          </div>
+          <div className="text-center mt-12 flex justify-center gap-4">
+    <button onClick={restartSurvey} className="bg-slate-500 ...">
+      Reiniciar Evaluación
+    </button>
+    <button onClick={() => handleSaveResults(answers, levelResults)} className="bg-blue-600 ...">
+      Guardar Resultados
+    </button>
+</div>
         </main>
       </div>
     );

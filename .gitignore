@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# .gitignore (en la raíz de tu proyecto)
+.env
+/backend/.env
